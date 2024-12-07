@@ -3,15 +3,14 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# Configure the Generative AI API with the API key
-API_KEY = 'AIzaSyCnHiPnc81WluNjSklL6lLR5FO_NbHRCfM'
+# API_KEY = 'AIzaSyCnHiPnc81WluNjSklL6lLR5FO_NbHRCfM'
+API_KEY ="AIzaSyBsMjXeoDus8RFniDn4octUAGJ5osac7II"
+
 genai.configure(api_key=API_KEY)
 
-# Initialize the generative model and start the chat session
 model = genai.GenerativeModel('gemini-pro')
 chat = model.start_chat(history=[])
 
-# Define the instruction and keywords for medical queries
 instruction = "In this chat, respond to medical-related queries only. If the query is not medical-related, please respond with a polite message stating that I can only answer medical questions."
 medical_keywords = [
     'doctor', 'medicine', 'health', 'symptom', 'treatment', 'diagnosis', 
