@@ -1,17 +1,20 @@
 from flask import Flask, render_template, request, jsonify
-import google.generativeai as genai
+from langchain_groq import ChatGroq  # Import the ChatGroq API
 
 app = Flask(__name__)
 
-# API_KEY = 'AIzaSyCnHiPnc81WluNjSklL6lLR5FO_NbHRCfM'
-API_KEY ="AIzaSyBsMjXeoDus8RFniDn4octUAGJ5osac7II"
+# Groq API Key and Model Configuration
+groq_api_key = "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"
+model_name = "llama-3.1-8b-instant"
+ # Replace with the desired model name
 
-genai.configure(api_key=API_KEY)
+# Initialize the ChatGroq API client
+llm = ChatGroq(api_key=groq_api_key, model=model_name)
 
-model = genai.GenerativeModel('gemini-pro')
-chat = model.start_chat(history=[])
-
+# Define the instruction for the chat
 instruction = "In this chat, respond to medical-related queries only. If the query is not medical-related, please respond with a polite message stating that I can only answer medical questions."
+
+# List of medical-related keywords to identify if the query is related to medical topics
 medical_keywords = [
     'doctor', 'medicine', 'health', 'symptom', 'treatment', 'diagnosis', 
     'therapy', 'medical', 'hospital', 'clinic', 'pharmacy', 'nurse', 
@@ -51,15 +54,26 @@ def home():
 def ask():
     user_message = str(request.form['messageText'])
     
+    # Check if the query is medical-related
     if not is_medical_query(user_message):
         bot_response_text = "I'm sorry, I can only answer medical-related questions. Please ask a question related to medical topics."
     else:
-        bot_response = chat.send_message(user_message)
-        bot_response_text = bot_response.text
-    
+        # Send the query to the Groq API
+        prompt = f"Respond to the following medical query: {user_message}. Please provide concise yet efficient output. Don't give in markdown format."
+        
+        response = llm.invoke(prompt)
+        
+        # Get the response from the Groq API
+        if response:
+            bot_response_text = response.content
+        else:
+            bot_response_text = "Sorry, I couldn't find a relevant response at this moment."
+
+    # Return the response as JSON
     return jsonify({'status': 'OK', 'answer': bot_response_text})
 
 def is_medical_query(query):
+    """Check if the query is related to medical topics."""
     return any(keyword in query.lower() for keyword in medical_keywords)
 
 if __name__ == '__main__':
