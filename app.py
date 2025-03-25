@@ -4,7 +4,7 @@ from langchain_groq import ChatGroq  # Import the ChatGroq API
 app = Flask(__name__)
 
 # Groq API Key and Model Configuration
-groq_api_key = "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"
+groq_api_key = ""
 model_name = "llama-3.1-8b-instant"
  # Replace with the desired model name
 
